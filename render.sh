@@ -1,2 +1,2 @@
 # -ql renders in low quality
-manim -ql main.py Main AlgorithmA
+manim -ql main.py Main
