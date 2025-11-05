@@ -54,12 +54,19 @@ class AlgorithmA(Scene):
             .next_to(tc, DOWN, aligned_edge=LEFT)
         )
 
-        self.play(Write(tintro))
-        self.wait(1)
-        self.play(Write(ta))
-        self.wait(1)
-        self.play(Write(tb))
+        note = (
+            Tex(
+                r"\textit{Note: Definitions such as $G$, $S(T)$ (the set of predecessors of task $T$) "
+                r"and $N(T)$ are introduced in Coffman \& Graham, ``Optimal Scheduling for Two-Processor Systems,'' ",
+                tex_environment="flushleft",
+            )
+            .scale(0.6)
+            .set_color(GRAY)
+            .next_to(tfinal, DOWN, aligned_edge=LEFT)
+        )
+
+        algorithm_group = VGroup(tintro, ta, tb, tc, tfinal)
+
+        self.play(Write(algorithm_group))
+        self.play(FadeIn(note))
         self.wait(2)
-        self.play(Write(tc))
-        self.wait(2)
-        self.play(Write(tfinal))

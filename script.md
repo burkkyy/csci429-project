@@ -36,18 +36,28 @@ Well, looking at the graph its trival to see that we came pick a task with no de
 
 But lets imagine now that we have a lot of tasks, too many for just us to handle. So we call another person, maybe a friend or sibling. Now that there are two people working on tasks, how should you divide up the tasks between you and your partner?
 
-If we try the method before, we dont always necessarily pick the most optimal schedule. 
-**Show that naive method does not work with 2 processors**
-> animate the naive 1 processor case
+Before we look at the solution, lets make this problem easier to generalize. We can refer to tasks as T1, T2 and so on. 
 
-> Go through why method before does not work
+We'll call the two people P1 and P2. In computer science terms, more generally, we can think of them as processors, that can process tasks. We'll also keep track of the tasks P1 and P2 are working on, currently it can be seen as empty.
 
-So what is the most optimal scheduling strategy?
-This question was studied in the early 1970s, and an algorithm was found by Edward Coffman and Ronald Graham in their 1971 paper `Optimal Scheduling for Two-Processor Systems`. In this presentation I will be refering to this algorithm as the CoffmanGrahamAlgorithm.
+We'll also use the greek letter mu to represet the current time step. For now, we’ll assume that each task takes exactly one time step to complete. Later on we’ll explore what happens when tasks take different amounts of time.
 
+Lastly we'll call L the schedule, it shows the order in which tasks are done in.
+
+Now, let’s try processing these tasks using the same method as before — at each time step, we pick any task that has no remaining dependencies. Once a task is completed, we update the graph and continue choosing the next available tasks until everything is done.
+
+All the tasks are done, and we can see that it took 5 units of time to complete all 8 tasks. But can we do better? If we go back, we can see that there were two time steps where P2 wasn't doing any work, so maybe there’s a more efficient way to schedule everything.
+
+This question was studied in the early 1970s, and an algorithm was found by Edward Coffman and Ronald Graham in their 1971 paper `Optimal Scheduling for Two-Processor Systems`. In this presentation I will be refering to their method as the CoffmanGrahamAlgorithm.
 
 -- end
 
 ## 2-Processor CoffmanGrahamAlgorithm
 
-Before I show you the CoffmanGrahamAlgorithm
+-- begin
+
+So, what is the Coffman–Graham Algorithm?
+Here’s the full definition, exactly as it appears in the original paper.
+>animate algorithm
+
+For the purposes of this video, we won’t be using this formal definition. Instead, we’ll step through an example to build an intuitive understanding of how the algorithm works.
