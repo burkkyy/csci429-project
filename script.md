@@ -57,7 +57,12 @@ This question was studied in the early 1970s, and an algorithm was found by Edwa
 -- begin
 
 So, what is the Coffman–Graham Algorithm?
-Here’s the full definition, exactly as it appears in the original paper.
+Well, in their paper is written in a way that's hard to understand, but here’s the full definition, exactly as it appears in the original paper.
 >animate algorithm
 
-For the purposes of this video, we won’t be using this formal definition. Instead, we’ll step through an example to build an intuitive understanding of how the algorithm works.
+We won’t be using this formal definition, for now. Instead, we’ll step through an example to build an intuitive understanding of how the algorithm works. 
+
+First, lets go back to the same graph we had before. 
+> animate same graph as DAGScene
+
+Why was our schdule not optimal?

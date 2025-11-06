@@ -1,67 +1,52 @@
-DEFAULT_TASK_EXECUTION_TIME = 1
-MAX_TASKS = 100
-
-
-class T:
-    def __init__(self, task_id, execution_time=DEFAULT_TASK_EXECUTION_TIME):
-        self.task_id = task_id
-        self.work_done = 0
-        self.execution_time = execution_time
-
-    def finished(self):
-        return self.work_done == self.execution_time
-
-    def work(self):
-        if self.work_done >= self.execution_time:
-            raise Exception("Doing work on a finished Task")
-        self.work_done += 1
-
-
-class G:
+class TaskGraph:
     def __init__(self):
-        self.task_id = 0
-        self.tasks = {}
-        self.relations = []  # partial order
+        self.current_task_id = 0
+        self.tasks = set()
+        self.successors = {}
 
-    def add_task(self, execution_time):
-        if self.task_id >= MAX_TASKS:
-            raise Exception("Adding too many tasks")
+    def print_tasks(self):
+        print(self.tasks)
 
-        new_task_id = self.task_id
-        self.task_id += 1
+    def print_DAG(self):
+        print(self.successors)
 
-        self.tasks[new_task_id] = T(execution_time)
+    def add_task(self):
+        tid = self.current_task_id
 
-        return new_task_id
+        self.tasks.add(tid)
+        if tid not in self.successors:
+            self.successors[tid] = []
 
-    def add_dependency(self, predecessor_id, successor_id):
-        self.relations.append((predecessor_id, successor_id))
+        self.current_task_id += 1
+        return tid
 
-    def get_number_of_tasks(self):
-        return len(self.tasks)
+    def add_dependency(self, predescessor, successor):
+        if predescessor not in self.successors:
+            self.successors[predescessor] = []
+        if successor not in self.successors:
+            self.successors[successor] = []
 
-    def S(self, task_id):
-        """
-        Function defined from paper:
-        "The set of immediate successors of T will be denoted by S(T)" where T is some task
-        """
-        s = []
+        self.successors[predescessor].append(successor)
+        self.tasks.update({predescessor, successor})
 
-        for relation in self.relations:
-            if relation[0] == task_id:
-                s.append(relation[1])
-
-        return s
+    def S(self, v):
+        if v not in self.tasks:
+            raise f"Task {v} is not in set of tasks"
+        return self.successors[v]
 
 
-class CoffmanGrahamAlgorithm:
-    def __init__(self, task_graph: G):
-        self.task_graph = task_graph
-        self.L = []
+def coffman_graham_algorithm(G: TaskGraph):
+    pass
 
-    def solve_rec(self):
-        pass
 
-    def solve(self):
-        r = self.task_graph.get_number_of_tasks()
-        alpha = {}  # L^*
+if __name__ == "__main__":
+    G = TaskGraph()
+
+    t1 = G.add_task()
+    t2 = G.add_task()
+    t3 = G.add_task()
+
+    G.add_dependency(t1, t2)
+
+    G.print_tasks()
+    G.print_DAG()
