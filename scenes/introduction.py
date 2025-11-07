@@ -7,17 +7,17 @@ TASK_HEIGHT = 0.8
 
 class Title(Scene):
     def construct(self):
-        title = Text("Optimal Scheduling for Two-Processor Systems", font_size=36)
-        subtitle = Text(
-            "E. G. Coffman, Jr. and R. L. Graham", font_size=20, slant=ITALIC
+        title = Text(
+            "Visual Intuition for the Optimal Scheduling of M-Processor Systems",
+            font_size=26,
         )
 
-        VGroup(title, subtitle).arrange(DOWN, buff=0.3).move_to(ORIGIN)
+        VGroup(title).arrange(DOWN, buff=0.5).move_to(ORIGIN)
 
-        self.play(FadeIn(title), FadeIn(subtitle))
+        self.play(FadeIn(title))
         self.wait(4)
 
-        self.play(FadeOut(title, subtitle))
+        self.play(FadeOut(title))
 
 
 class TaskIntroduction(Scene):
@@ -32,67 +32,59 @@ class TaskIntroduction(Scene):
 
         # Step 1: create bullet points
         bullet_points = []
+        labels = []
+        bullet_label_pairs = []
         for text in tasks:
             bullet = Text("•", font_size=60, color=WHITE)
             label = Text(text, font_size=40)
-            entry = VGroup(bullet, label).arrange(RIGHT, buff=0.4)
-            bullet_points.append(entry)
+            bullet_points.append(bullet)
+            labels.append(label)
 
-        group = (
-            VGroup(*bullet_points)
-            .arrange(DOWN, aligned_edge=LEFT, buff=0.5)
-            .move_to(ORIGIN)
-        )
+            pair = VGroup(bullet, label).arrange(
+                RIGHT, buff=0.4
+            )  # bullet next to label
+            bullet_label_pairs.append(pair)
 
-        self.play(LaggedStart(*[Write(bp) for bp in group], lag_ratio=0.2))
-        self.wait(1)
+        group = VGroup(*bullet_label_pairs).arrange(DOWN, aligned_edge=LEFT, buff=0.5)
+        group.move_to(ORIGIN)
 
-        # Step 2: transition bullets into boxes
-        boxes = []
-        for entry in bullet_points:
-            label = entry[1]  # the text part
-            box = SurroundingRectangle(label, color=WHITE, stroke_width=3, buff=0.2)
-            boxes.append(VGroup(box, label))
-
-        # VGroup(*boxes).arrange(DOWN, aligned_edge=LEFT, buff=0.6).move_to(ORIGIN)
+        self.play(LaggedStart(*[Write(pair) for pair in group], lag_ratio=0.2))
+        self.wait(2)
 
         self.play(
-            *[FadeOut(entry[0]) for entry in bullet_points],
-        )
-        self.play(
-            *[Create(box[0]) for box in boxes],
+            *[FadeOut(bullet_point) for bullet_point in bullet_points],
         )
         self.wait(2)
 
         # Move boxs around
         self.play(
             # Buy Groceries box
-            boxes[0].animate.move_to(UP * 2 + LEFT * 3),
+            labels[0].animate.move_to(UP * 2 + LEFT * 3),
             # cook_dinner_box
-            boxes[1].animate.move_to(LEFT * 3),
+            labels[1].animate.move_to(LEFT * 3),
             # clean_up_box
-            boxes[2].animate.move_to(DOWN * 2 + LEFT * 3),
+            labels[2].animate.move_to(DOWN * 2 + LEFT * 3),
             # do_laundry_box
-            boxes[3].animate.move_to(RIGHT * 2 + UP * 2),
+            labels[3].animate.move_to(RIGHT * 2 + UP * 2),
             # put_away_laundry_box
-            boxes[4].animate.move_to(RIGHT * 2),
+            labels[4].animate.move_to(RIGHT * 2),
         )
         self.wait(2)
 
         # Draw arrows
         a1 = Arrow(
-            start=boxes[0].get_bottom(),
-            end=boxes[1].get_top(),
+            start=labels[0].get_bottom(),
+            end=labels[1].get_top(),
             buff=0.1,
         )
         a2 = Arrow(
-            start=boxes[1].get_bottom(),
-            end=boxes[2].get_top(),
+            start=labels[1].get_bottom(),
+            end=labels[2].get_top(),
             buff=0.1,
         )
         a3 = Arrow(
-            start=boxes[3].get_bottom(),
-            end=boxes[4].get_top(),
+            start=labels[3].get_bottom(),
+            end=labels[4].get_top(),
             buff=0.1,
         )
         self.play(Create(a1), Create(a2), Create(a3))
@@ -100,48 +92,48 @@ class TaskIntroduction(Scene):
 
         # Animate working on tasks using naive method
         task_worker = Arrow(
-            start=boxes[0].get_left() + LEFT * 1.5,
-            end=boxes[0].get_left() + LEFT * 0.5,
+            start=labels[0].get_left() + LEFT * 1.5,
+            end=labels[0].get_left() + LEFT * 0.5,
             buff=0,
             color=BLUE,
         )
 
         self.play(GrowArrow(task_worker))
         self.wait(1)
-        self.play(FadeOut(boxes[0]), FadeOut(a1))
+        self.play(FadeOut(labels[0]), FadeOut(a1))
 
         self.play(
             task_worker.animate.move_to(
-                boxes[1].get_left() + LEFT,
+                labels[1].get_left() + LEFT,
             )
         )
         self.wait(1)
 
-        self.play(FadeOut(boxes[1]), FadeOut(a2))
+        self.play(FadeOut(labels[1]), FadeOut(a2))
         self.play(
             task_worker.animate.move_to(
-                boxes[2].get_left() + LEFT,
+                labels[2].get_left() + LEFT,
             )
         )
         self.wait(1)
 
-        self.play(FadeOut(boxes[2]))
+        self.play(FadeOut(labels[2]))
         self.play(
             task_worker.animate.move_to(
-                boxes[3].get_left() + LEFT,
+                labels[3].get_left() + LEFT,
             )
         )
         self.wait(1)
 
-        self.play(FadeOut(boxes[3]), FadeOut(a3))
+        self.play(FadeOut(labels[3]), FadeOut(a3))
         self.play(
             task_worker.animate.move_to(
-                boxes[4].get_left() + LEFT,
+                labels[4].get_left() + LEFT,
             )
         )
         self.wait(1)
 
-        self.play(FadeOut(boxes[4]))
+        self.play(FadeOut(labels[4]))
         self.wait(1)
 
 
