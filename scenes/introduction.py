@@ -145,6 +145,52 @@ class TaskIntroduction(Scene):
         self.wait(1)
 
 
+class TimeComplexityExplanation(Scene):
+    def construct(self):
+        title = Text("Naive Task Scheduling Approach", font_size=36).to_edge(UP)
+        self.play(Write(title))
+        self.wait(0.5)
+
+        # Pseudocode text
+        code = (
+            Code(
+                code_string="""
+tasks = {...}
+schedule = []
+
+for i in range(len(tasks)):
+    for task in tasks:
+        if task has no dependencies:
+            schedule.append(task)
+            tasks.remove(task)
+            break
+""",
+                tab_width=4,
+                background="rectangle",
+                language="Python",
+            )
+            .scale(0.8)
+            .to_edge(LEFT)
+        )
+
+        self.play(FadeIn(code, shift=RIGHT))
+        self.wait(2)
+
+        # Complexity explanation text
+        comment = (
+            Tex(
+                r"Time complexity of this approach: \\$O(n^2)$",
+            )
+            .scale(0.8)
+            .next_to(code, buff=0.8)
+        )
+        comment.next_to(code, RIGHT)
+
+        # Fade in the complexity line
+        self.play(FadeIn(comment))
+        self.wait(2)
+
+
 class DAGScene(Scene):
     def draw_arrow(self, parent_box, child_box, color=WHITE, buff=0.1):
         start = parent_box.get_bottom()
@@ -198,9 +244,6 @@ class DAGScene(Scene):
         boxes[6].move_to(LEFT + DOWN * 2)
         boxes[7].move_to(RIGHT * 3 + UP * 2)
 
-        self.play(*[Create(box) for box in boxes])
-        self.wait(2)
-
         arrows = []
         arrows.append(self.draw_arrow(boxes[0], boxes[1]))
         arrows.append(self.draw_arrow(boxes[0], boxes[2]))
@@ -210,7 +253,7 @@ class DAGScene(Scene):
         arrows.append(self.draw_arrow(boxes[5], boxes[6]))
         arrows.append(self.draw_arrow(boxes[7], boxes[5]))
 
-        self.play(*[Create(arrow) for arrow in arrows])
+        self.play(*[Create(box) for box in boxes], *[Create(arrow) for arrow in arrows])
         self.wait(2)
 
         # Relabel the boxes
