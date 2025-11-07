@@ -32,6 +32,8 @@ In what order would you do these tasks?
 Well, looking at the graph its trival to see that we came pick a task with no dependencies to work on. Once done, we just repeat, picking tasks with no depencies until all tasks are done, and we are done.
 > animate picking tasks with no dependencies and doing the next one
 
+As for the time complexity of this approach, skipping over some details, if we are give a set of tasks, at each step in time we are simply searching for one task with no depencies. In a worst case, we could be seaching over all the tasks. So this naive approach is O(n), where n is the number of tasks   
+
 -- pause
 
 But lets imagine now that we have a lot of tasks, too many for just us to handle. So we call another person, maybe a friend or sibling. Now that there are two people working on tasks, how should you divide up the tasks between you and your partner?
@@ -42,7 +44,8 @@ We'll call the two people P1 and P2. In computer science terms, more generally, 
 
 We'll also use the greek letter mu to represet the current time step. For now, we’ll assume that each task takes exactly one time step to complete. Later on we’ll explore what happens when tasks take different amounts of time.
 
-Lastly we'll call L the schedule, it shows the order in which tasks are done in.
+> break
+Lastly, the schedule produced by P1 and P2 we shall call L, it simply keeps track of the order in which tasks are done in.
 
 Now, let’s try processing these tasks using the same method as before — at each time step, we pick any task that has no remaining dependencies. Once a task is completed, we update the graph and continue choosing the next available tasks until everything is done.
 
@@ -62,7 +65,7 @@ Well, in their paper is written in a way that's hard to understand, but here’s
 
 We won’t be using this formal definition, for now. Instead, we’ll step through an example to build an intuitive understanding of how the algorithm works. 
 
-First, lets go back to the same graph we had before. 
+Lets go back to the same graph we had before. 
 > animate same graph as DAGScene
 
 Why was our schdule not optimal?
