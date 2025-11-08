@@ -458,7 +458,12 @@ class DAGScene(Scene):
 
         self.wait(2)
 
+        end_text = (
+            Text("Can we do better?", font_size=28)
+            .next_to(l_label, DOWN, buff=0.4)
+            .shift(DOWN * 0.5)
+        )
 
-class DAGSceneCounterExample(Scene):
-    def construct(self):
-        pass
+        self.play(FadeIn(end_text))
+
+        self.wait(2)

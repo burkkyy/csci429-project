@@ -1,6 +1,53 @@
 from manim import *
 
 
+class PaperDisplay(Scene):
+    def construct(self):
+        # Load image (e.g. first page of paper)
+        paper_img = ImageMobject("resources/paper-image-1.png")
+
+        # Add white rectangle border
+        border = SurroundingRectangle(paper_img, color=WHITE, buff=0.1, stroke_width=3)
+
+        # Group image and border together
+        paper_group = Group(paper_img, border).shift(LEFT * 4)
+
+        # Create text elements
+        title = Text("Optimal Scheduling for Two-Processor\nSystems", font_size=28)
+        authors = Text("E. G. Coffman Jr and R. L. Graham", font_size=20, slant=ITALIC)
+        text_group = VGroup(title, authors).arrange(DOWN, aligned_edge=LEFT)
+
+        # Position text to the right of the image
+        text_group.next_to(paper_group, RIGHT, buff=1.0)
+
+        # Add everything to the scene
+        self.add(paper_group, text_group)
+
+        # Optional animation
+        self.play(FadeIn(paper_group), FadeIn(text_group, shift=RIGHT))
+        self.wait(5)
+
+        new_img1 = ImageMobject("resources/paper-image-2.png").scale(1)
+        new_border1 = SurroundingRectangle(
+            new_img1, color=WHITE, buff=0.1, stroke_width=3
+        )
+        new_group1 = Group(new_img1, new_border1).move_to(paper_group.get_center())
+
+        # Smooth transition
+        self.play(FadeOut(paper_group), FadeIn(new_group1))
+        self.wait(5)
+
+        new_img2 = ImageMobject("resources/paper-image-3.png").scale(1)
+        new_border2 = SurroundingRectangle(
+            new_img2, color=WHITE, buff=0.1, stroke_width=3
+        )
+        new_group2 = Group(new_img2, new_border2).move_to(new_group1.get_center())
+
+        # Smooth transition
+        self.play(FadeOut(new_group1), FadeIn(new_group2))
+        self.wait(5)
+
+
 class AlgorithmA(Scene):
     def construct(self):
         tintro = (
@@ -69,4 +116,398 @@ class AlgorithmA(Scene):
 
         self.play(Write(algorithm_group))
         self.play(FadeIn(note))
+        self.wait(2)
+
+
+class OptimalScheduleForIntroDAG(Scene):
+    def draw_arrow(self, parent_box, child_box, color=WHITE, buff=0.1):
+        start = parent_box.get_bottom()
+        end = child_box.get_top()
+
+        arrow = Arrow(
+            start=start,
+            end=end,
+            buff=buff,
+            color=color,
+            tip_shape=StealthTip,
+            tip_length=0.2,
+            stroke_width=3,
+        )
+        return arrow
+
+    def create_processor(self, task, color=BLUE):
+        task_worker = Arrow(
+            start=task.get_left() + LEFT,
+            end=task.get_left() + LEFT * 0.25,
+            buff=0,
+            color=color,
+        )
+        return task_worker
+
+    def construct(self):
+        tasks = []
+        for i in range(8):
+            label = MathTex(f"T_{{{i+1}}}", font_size=40)
+            tasks.append(label)
+
+        tasks[0].move_to(LEFT * 2.5 + UP * 3)
+        tasks[1].move_to(LEFT * 4 + UP)
+        tasks[2].move_to(LEFT + UP)
+        tasks[3].move_to(LEFT * 4 + DOWN * 2 + UP)
+        tasks[4].move_to(UP * 3)
+        tasks[5].move_to(RIGHT * 3 + UP)
+        tasks[6].move_to(LEFT + DOWN)
+        tasks[7].move_to(RIGHT * 3 + UP * 3)
+
+        arrows = []
+        arrows.append(self.draw_arrow(tasks[0], tasks[1]))
+        arrows.append(self.draw_arrow(tasks[0], tasks[2]))
+        arrows.append(self.draw_arrow(tasks[2], tasks[3]))
+        arrows.append(self.draw_arrow(tasks[2], tasks[6]))
+        arrows.append(self.draw_arrow(tasks[4], tasks[2]))
+        arrows.append(self.draw_arrow(tasks[5], tasks[6]))
+        arrows.append(self.draw_arrow(tasks[7], tasks[5]))
+
+        self.play(
+            *[Create(task) for task in tasks], *[Create(arrow) for arrow in arrows]
+        )
+
+        status_box = Rectangle(
+            width=config.frame_width - 1,
+            height=1.5,
+            color=WHITE,
+            stroke_width=3,
+        )
+
+        status_box.to_edge(DOWN, buff=0.5)
+
+        p1_label = Tex(r"$P_1$: $\emptyset$", font_size=32, color=BLUE)
+        p2_label = Tex(r"$P_2$: $\emptyset$", font_size=32, color=RED)
+        mu_label = MathTex(r"\mu = 0", font_size=32)
+        l_label = MathTex(r"L = ()", font_size=32)
+
+        left_group = VGroup(p1_label, p2_label).arrange(
+            DOWN, aligned_edge=LEFT, buff=0.2
+        )
+
+        left_group.move_to(status_box.get_left() + RIGHT)
+
+        right_group = VGroup(mu_label, l_label).arrange(
+            DOWN, aligned_edge=LEFT, buff=0.2
+        )
+
+        right_group.move_to(status_box.get_right() + LEFT * 8)
+
+        # Add to scene
+        self.play(FadeIn(status_box))
+        self.play(Write(left_group), Write(right_group))
+        self.wait(2)
+
+        # do optimal schedule
+        time_step = 0
+
+        def relabel_time_step(new_time):
+            new_mu_label = MathTex(rf"\mu = {new_time}", font_size=32)
+            new_mu_label.move_to(mu_label)
+            mu_label.become(new_mu_label)
+
+        def relabel_processors(p1=r"\emptyset", p2=r"\emptyset"):
+            new_p1_label = Tex(rf"$P_1$: ${p1}$", font_size=32, color=BLUE)
+            new_p2_label = Tex(rf"$P_2$: ${p2}$", font_size=32, color=RED)
+
+            new_p1_label.next_to(p1_label, direction=LEFT, buff=0).align_to(
+                p1_label, LEFT
+            )
+            new_p2_label.next_to(p2_label, direction=LEFT, buff=0).align_to(
+                p2_label, LEFT
+            )
+
+            p1_label.become(new_p1_label)
+            p2_label.become(new_p2_label)
+
+        def relabel_schedule(schedule):
+            new_l_label = MathTex(rf"L = ({schedule})", font_size=32)
+            new_l_label.next_to(l_label, direction=LEFT, buff=0).align_to(l_label, LEFT)
+            l_label.become(new_l_label)
+
+        # Time step 0: Start p1 and p2 on T1 and T5
+        p1 = self.create_processor(tasks[0], BLUE)
+        p2 = self.create_processor(tasks[4], RED)
+        TIME_STEP_DURATION = 1
+
+        self.play(Create(p1), Create(p2))
+        relabel_processors(r"T_1", r"T_5")
+        self.wait(TIME_STEP_DURATION)
+
+        schedule = r""
+
+        # Time step 1
+        self.play(
+            FadeOut(tasks[0]),
+            FadeOut(tasks[4]),
+            FadeOut(arrows[0]),
+            FadeOut(arrows[1]),
+            FadeOut(arrows[4]),
+        )
+        self.play(
+            p1.animate.move_to(
+                tasks[2].get_left() + LEFT * 0.5,
+            ),
+            p2.animate.move_to(
+                tasks[7].get_left() + LEFT * 0.5,
+            ),
+        )
+        time_step += 1
+        schedule += r"T_1, T_5"
+        relabel_schedule(schedule)
+        relabel_time_step(time_step)
+        relabel_processors(r"T_3", r"T_8")
+        self.wait(TIME_STEP_DURATION)
+
+        # Time step 2
+        self.play(
+            FadeOut(tasks[2]),
+            FadeOut(tasks[7]),
+            FadeOut(arrows[2]),
+            FadeOut(arrows[3]),
+            FadeOut(arrows[6]),
+        )
+        self.play(
+            p1.animate.move_to(
+                tasks[1].get_left() + LEFT * 0.5,
+            ),
+            p2.animate.move_to(
+                tasks[5].get_left() + LEFT * 0.5,
+            ),
+        )
+        time_step += 1
+        schedule += r", T_3, T_8"
+        relabel_schedule(schedule)
+        relabel_time_step(time_step)
+        relabel_processors(r"T_2", r"T_6")
+        self.wait(TIME_STEP_DURATION)
+
+        # Time step 3
+        self.play(
+            FadeOut(tasks[1]),
+            FadeOut(tasks[5]),
+            FadeOut(arrows[5]),
+        )
+        self.play(
+            p1.animate.move_to(
+                tasks[3].get_left() + LEFT * 0.5,
+            ),
+            p2.animate.move_to(
+                tasks[6].get_left() + LEFT * 0.5,
+            ),
+        )
+        time_step += 1
+        schedule += r", T_2, T_6"
+        relabel_schedule(schedule)
+        relabel_time_step(time_step)
+        relabel_processors(r"T_4", r"T_7")
+        self.wait(TIME_STEP_DURATION)
+
+        # Time step 4
+        self.play(
+            FadeOut(tasks[3]),
+            FadeOut(tasks[6]),
+        )
+        self.play(FadeOut(p1), FadeOut(p2))
+        time_step += 1
+        schedule += r", T_4, T_7"
+        relabel_schedule(schedule)
+        relabel_time_step(time_step)
+        relabel_processors()
+        self.wait(TIME_STEP_DURATION)
+
+        # Fade out and show results
+        fade_group = VGroup(
+            status_box,
+            p1_label,
+            p2_label,
+        )
+
+        # Target positions
+        final_l_label = l_label.copy().move_to(ORIGIN + DOWN * 0.5)
+        final_mu_label = mu_label.copy().move_to(ORIGIN + UP * 0.5)
+
+        self.play(
+            FadeOut(fade_group),
+            l_label.animate.move_to(final_l_label),
+            mu_label.animate.move_to(final_mu_label),
+            run_time=2,
+        )
+
+        # Optionally, enlarge and center the final labels for emphasis
+        self.play(
+            l_label.animate.scale(1.3),
+            mu_label.animate.scale(1.3),
+        )
+
+        self.wait(2)
+
+        comment1 = Tex(
+            r"Our previous time was $5$, so we did one time step better",
+            font_size=36,
+        )
+
+        comment = (
+            VGroup(comment1).arrange(DOWN, buff=0.2).next_to(l_label, DOWN, buff=0.4)
+        )
+
+        self.play(FadeIn(comment))
+
+        self.wait(2)
+
+
+class CoffmanGrahamAlgorithmExplainerPart1(Scene):
+    def draw_arrow(self, parent_box, child_box, color=WHITE, buff=0.1):
+        start = parent_box.get_bottom()
+        end = child_box.get_top()
+
+        arrow = Arrow(
+            start=start,
+            end=end,
+            buff=buff,
+            color=color,
+            tip_shape=StealthTip,
+            tip_length=0.2,
+            stroke_width=3,
+        )
+        return arrow
+
+    def create_processor(self, task, color=BLUE):
+        task_worker = Arrow(
+            start=task.get_left() + LEFT,
+            end=task.get_left() + LEFT * 0.25,
+            buff=0,
+            color=color,
+        )
+        return task_worker
+
+    def construct(self):
+        tasks = []
+        for i in range(8):
+            label = MathTex(f"T_{{{i+1}}}", font_size=40)
+            tasks.append(label)
+
+        tasks[0].move_to(LEFT * 2.5 + UP * 3)
+        tasks[1].move_to(LEFT * 4 + UP)
+        tasks[2].move_to(LEFT + UP)
+        tasks[3].move_to(LEFT * 4 + DOWN * 2 + UP)
+        tasks[4].move_to(UP * 3)
+        tasks[5].move_to(RIGHT * 3 + UP)
+        tasks[6].move_to(LEFT + DOWN)
+        tasks[7].move_to(RIGHT * 3 + UP * 3)
+
+        arrows = []
+        arrows.append(self.draw_arrow(tasks[0], tasks[1]))
+        arrows.append(self.draw_arrow(tasks[0], tasks[2]))
+        arrows.append(self.draw_arrow(tasks[2], tasks[3]))
+        arrows.append(self.draw_arrow(tasks[2], tasks[6]))
+        arrows.append(self.draw_arrow(tasks[4], tasks[2]))
+        arrows.append(self.draw_arrow(tasks[5], tasks[6]))
+        arrows.append(self.draw_arrow(tasks[7], tasks[5]))
+
+        self.add(*tasks)
+        self.add(*arrows)
+
+        status_box = Rectangle(
+            width=config.frame_width - 1,
+            height=1.5,
+            color=WHITE,
+            stroke_width=3,
+        )
+
+        status_box.to_edge(DOWN, buff=0.5)
+
+        p1_label = Tex(r"$P_1$: $\emptyset$", font_size=32, color=BLUE)
+        p2_label = Tex(r"$P_2$: $\emptyset$", font_size=32, color=RED)
+        mu_label = MathTex(r"\mu = 0", font_size=32)
+        lstar_label = MathTex(r"L^* = ()", font_size=32)
+
+        left_group = VGroup(p1_label, p2_label).arrange(
+            DOWN, aligned_edge=LEFT, buff=0.2
+        )
+
+        left_group.move_to(status_box.get_left() + RIGHT)
+
+        right_group = VGroup(mu_label, lstar_label).arrange(
+            DOWN, aligned_edge=LEFT, buff=0.2
+        )
+
+        right_group.move_to(status_box.get_right() + LEFT * 8)
+
+        # Add to scene
+        self.add(status_box)
+        self.add(left_group)
+        self.add(mu_label)
+        self.wait(2)
+
+        self.play(Write(lstar_label))
+        self.wait(2)
+
+        definition_text1 = Text(
+            "Successor of a task T: any task that depends on T",
+            font_size=28,
+            t2c={"Successor": BLUE},  # optional: color the word 'Successor'
+        )
+        definition_text2 = Text(
+            "(i.e. tasks that can't be done until T is done).",
+            font_size=28,
+        )
+
+        definition_text = VGroup(definition_text1, definition_text2).arrange(DOWN)
+
+        # Create black background rectangle, slightly bigger than text
+        definition_box = SurroundingRectangle(
+            definition_text,
+            color=WHITE,  # border color
+            fill_color=BLACK,  # background color
+            fill_opacity=1.0,
+            buff=0.5,
+            stroke_width=2,
+        )
+
+        # Group text and rectangle
+        successor_group = VGroup(definition_box, definition_text)
+
+        # Center on screen
+        successor_group.move_to(ORIGIN)
+
+        # Animate it
+        self.play(FadeIn(successor_group))
+        self.wait(3)
+
+        self.play(FadeOut(successor_group))
+        self.wait(2)
+
+        self.play(Indicate(tasks[0], color=YELLOW, scale_factor=1.2))
+        self.play(Indicate(tasks[4], color=YELLOW, scale_factor=1.2))
+        self.wait(1)
+
+        self.play(Indicate(tasks[0], color=YELLOW, scale_factor=1.2))
+        self.play(Indicate(tasks[7], color=YELLOW, scale_factor=1.2))
+        self.wait(1)
+
+        self.play(Indicate(tasks[7], color=YELLOW, scale_factor=1.2))
+        self.play(Indicate(tasks[4], color=YELLOW, scale_factor=1.2))
+        self.wait(1)
+
+        self.wait(2)
+
+        self.play(
+            Indicate(tasks[1], color=YELLOW, scale_factor=1.2),
+            Indicate(tasks[3], color=YELLOW, scale_factor=1.2),
+            Indicate(tasks[6], color=YELLOW, scale_factor=1.2),
+        )
+        self.wait(2)
+
+        new_lstar_label = MathTex(r"L = (T_2, T_4, T_7)", font_size=32)
+        new_lstar_label.next_to(lstar_label, direction=LEFT, buff=0).align_to(
+            lstar_label, LEFT
+        )
+
+        self.play(Transform(lstar_label, new_lstar_label))
         self.wait(2)

@@ -102,7 +102,22 @@ So lets put task 2, 4 and 7 in Lstar. It should be noted that their order doesnt
 
 -- STOP
 
-Now we want to figure out which task is the least priority to put in the third last slot of Lstar... which task should it be?
+Now that Lstar is starting to get populated, I will do something that may seem strange at first, Im going to write down the position of each task in Lstar next to each task. We will see how this is useful later.
+
+Now, at this point, we want to figure out which task to do the fourth last, and then we can put that task at the front of Lstar. Remeber that Lstar is our optimal schedule we wish to find, still in progress...
+
+So, which task? Well, we can use the same exact logic as before. Which task should we do last? But whats different now is that some tasks are already in Lstar.
+
+So we should only consider tasks that are not in Lstar
+> animate array
+
+-- IMPORTANT
+But now what? Well, if you look cafefully, some of these tasks have all their sucessors in Lstar 
+
+For example, T_1 successors are T_1 and T_1, which are both in Lstar. So it follows that this task can be done later.
+
+The reason here is simple, all of T_1's successors are being done later in Lstar, so we can do T_1 as later on as possible, just before its successors 
+
 
 -- break
 
