@@ -422,30 +422,28 @@ class CoffmanGrahamAlgorithmExplainerPart1(Scene):
 
         status_box.to_edge(DOWN, buff=0.5)
 
-        p1_label = Tex(r"$P_1$: $\emptyset$", font_size=32, color=BLUE)
-        p2_label = Tex(r"$P_2$: $\emptyset$", font_size=32, color=RED)
-        mu_label = MathTex(r"\mu = 0", font_size=32)
         lstar_label = MathTex(r"L^* = ()", font_size=32)
 
-        left_group = VGroup(p1_label, p2_label).arrange(
-            DOWN, aligned_edge=LEFT, buff=0.2
-        )
+        def rewrite_lstar(txt):
+            new_lstar_label = MathTex(txt, font_size=32)
+            new_lstar_label.next_to(lstar_label, direction=LEFT, buff=0).align_to(
+                lstar_label, LEFT
+            )
 
-        left_group.move_to(status_box.get_left() + RIGHT)
+            self.play(Transform(lstar_label, new_lstar_label))
 
-        right_group = VGroup(mu_label, lstar_label).arrange(
-            DOWN, aligned_edge=LEFT, buff=0.2
-        )
+        lstar_label.arrange(DOWN, aligned_edge=LEFT, buff=0.2)
 
-        right_group.move_to(status_box.get_right() + LEFT * 8)
+        lstar_label.move_to(status_box.get_right() + LEFT * 7)
 
         # Add to scene
         self.add(status_box)
-        self.add(left_group)
-        self.add(mu_label)
         self.wait(2)
 
         self.play(Write(lstar_label))
+        self.wait(2)
+
+        rewrite_lstar(r"L^* = (\Box, \Box, \Box, \Box, \Box, \Box, \Box, \Box)")
         self.wait(2)
 
         definition_text1 = Text(
@@ -483,16 +481,22 @@ class CoffmanGrahamAlgorithmExplainerPart1(Scene):
         self.play(FadeOut(successor_group))
         self.wait(2)
 
-        self.play(Indicate(tasks[0], color=YELLOW, scale_factor=1.2))
-        self.play(Indicate(tasks[4], color=YELLOW, scale_factor=1.2))
+        self.play(
+            Indicate(tasks[0], color=YELLOW, scale_factor=1.2),
+            Indicate(tasks[4], color=YELLOW, scale_factor=1.2),
+        )
         self.wait(1)
 
-        self.play(Indicate(tasks[0], color=YELLOW, scale_factor=1.2))
-        self.play(Indicate(tasks[7], color=YELLOW, scale_factor=1.2))
+        self.play(
+            Indicate(tasks[0], color=YELLOW, scale_factor=1.2),
+            Indicate(tasks[7], color=YELLOW, scale_factor=1.2),
+        )
         self.wait(1)
 
-        self.play(Indicate(tasks[7], color=YELLOW, scale_factor=1.2))
-        self.play(Indicate(tasks[4], color=YELLOW, scale_factor=1.2))
+        self.play(
+            Indicate(tasks[7], color=YELLOW, scale_factor=1.2),
+            Indicate(tasks[4], color=YELLOW, scale_factor=1.2),
+        )
         self.wait(1)
 
         self.wait(2)
@@ -504,10 +508,264 @@ class CoffmanGrahamAlgorithmExplainerPart1(Scene):
         )
         self.wait(2)
 
-        new_lstar_label = MathTex(r"L = (T_2, T_4, T_7)", font_size=32)
-        new_lstar_label.next_to(lstar_label, direction=LEFT, buff=0).align_to(
-            lstar_label, LEFT
+        rewrite_lstar(r"L^* = (\Box, \Box, \Box, \Box, \Box, T_2, T_4, T_7)")
+        self.wait(2)
+
+        t2_index_label = MathTex(f"T_2: 5", font_size=40)
+        t4_index_label = MathTex(f"T_4: 6", font_size=40)
+        t7_index_label = MathTex(f"T_7: 7", font_size=40)
+
+        t2_index_label.next_to(tasks[1], direction=LEFT, buff=0).align_to(
+            tasks[1], LEFT
+        )
+        t4_index_label.next_to(tasks[3], direction=LEFT, buff=0).align_to(
+            tasks[3], LEFT
+        )
+        t7_index_label.next_to(tasks[6], direction=LEFT, buff=0).align_to(
+            tasks[6], LEFT
         )
 
-        self.play(Transform(lstar_label, new_lstar_label))
+        self.play(
+            Transform(tasks[1], t2_index_label),
+            Transform(tasks[3], t4_index_label),
+            Transform(tasks[6], t7_index_label),
+        )
         self.wait(2)
+
+        arrow_x = lstar_label.get_center()[0] + 0.5
+        arrow_y = status_box.get_top()[1] - 0.6
+
+        task_arrow = Arrow(
+            start=[arrow_x, arrow_y + 0.5, 0],
+            end=[arrow_x, arrow_y + 0.1, 0],
+            color=YELLOW,
+            stroke_width=15,
+            buff=0,
+        )
+
+        self.bring_to_front(task_arrow)
+        self.play(Create(task_arrow))
+        self.wait(2)
+
+        canidate_tasks = MathTex(
+            r"\text{candidates} = \left[\begin{array}{l} T_3 \\ T_6 \end{array}\right]",
+            font_size=32,
+        )
+        canidate_tasks.move_to(status_box.get_left() + RIGHT * 2.5)
+
+        def rewrite_canidate_tasks(txt):
+            if txt == "":
+                self.play(FadeOut(canidate_tasks))
+
+            new_canidate_tasks = MathTex(txt, font_size=32)
+            new_canidate_tasks.next_to(canidate_tasks, direction=LEFT, buff=0).align_to(
+                canidate_tasks, LEFT
+            )
+            self.play(Transform(canidate_tasks, new_canidate_tasks))
+
+        self.play(Write(canidate_tasks))
+        self.wait(2)
+
+        self.play(Indicate(canidate_tasks))
+        self.wait(2)
+
+        canidate_tasks_expanded = MathTex(
+            r"\text{candidates} = \left[\begin{array}{l} T_3: [7, 6] \\ T_6: [7] \end{array}\right]",
+            font_size=32,
+        )
+        canidate_tasks_expanded.move_to(status_box.get_left() + RIGHT * 2.5)
+
+        self.play(Transform(canidate_tasks, canidate_tasks_expanded))
+        self.wait(2)
+
+        definition_text = VGroup(
+            Text("Lexicographical Ordering", font_size=28, color=BLUE),
+            Tex(r"Given two arrays $A$ and $B$, $A < B$ if:", font_size=28),
+            Tex(
+                r"First differing elements at index $i$, $A[i] < B[i]$",
+                font_size=28,
+            ),
+            Tex(
+                r"OR",
+                font_size=28,
+            ),
+            Tex(
+                r"$A$ is a prefix of $B$",
+                font_size=28,
+            ),
+        ).arrange(DOWN)
+
+        definition_box = SurroundingRectangle(
+            definition_text,
+            color=WHITE,  # border color
+            fill_color=BLACK,  # background color
+            fill_opacity=1.0,
+            buff=0.5,
+            stroke_width=2,
+        )
+
+        definition = VGroup(definition_box, definition_text)
+
+        self.play(FadeIn(definition))
+        self.wait(3)
+        self.play(FadeOut(definition))
+        self.wait(3)
+
+        def coffman_graham_step(
+            txt1, new_canidate_tasks_txt, task_index, new_task_label_text, is_last=False
+        ):
+            new_lstar_label = MathTex(txt1, font_size=32)
+            new_lstar_label.next_to(lstar_label, direction=LEFT, buff=0).align_to(
+                lstar_label, LEFT
+            )
+
+            new_canidate_tasks = MathTex(
+                r"\text{candidates} = \left[\begin{array}{l} \\ \end{array}\right]",
+                font_size=32,
+            )
+            new_canidate_tasks.next_to(canidate_tasks, direction=LEFT, buff=0).align_to(
+                canidate_tasks, LEFT
+            )
+
+            task_index_label = MathTex(new_task_label_text, font_size=40)
+
+            task_index_label.next_to(
+                tasks[task_index], direction=LEFT, buff=0
+            ).align_to(tasks[task_index], LEFT)
+
+            animations = [
+                Transform(lstar_label, new_lstar_label),
+            ]
+
+            if not is_last:
+                animations.append(task_arrow.animate.shift(LEFT * 0.4))
+
+            animations.append(
+                Transform(tasks[task_index], task_index_label),
+            )
+
+            animations.append(
+                Transform(canidate_tasks, new_canidate_tasks),
+            )
+
+            self.play(*animations)
+
+            self.wait(1)
+
+            if is_last:
+                self.play(FadeOut(canidate_tasks), FadeOut(task_arrow))
+            else:
+                rewrite_canidate_tasks(new_canidate_tasks_txt)
+
+        coffman_graham_step(
+            r"L^* = (\Box, \Box, \Box, \Box, T_6, T_2, T_4, T_7)",
+            r"\text{candidates} = \left[\begin{array}{l} T_3: [7, 6] \\ T_8: [4] \end{array}\right]",
+            5,
+            r"T_6: 4",
+        )
+        self.wait(1)
+
+        # 1. write canidates
+        # 2. wait(1)
+        # 3. coffman graham step + write task
+
+        coffman_graham_step(
+            r"L^* = (\Box, \Box, \Box, T_8, T_6, T_2, T_4, T_7)",
+            r"\text{candidates} = \left[\begin{array}{l} T_3: [7, 6] \\ \end{array}\right]",
+            7,
+            r"T_8: 3",
+        )
+        self.wait(1)
+
+        coffman_graham_step(
+            r"L^* = (\Box, \Box, T_3, T_8, T_6, T_2, T_4, T_7)",
+            r"\text{candidates} = \left[\begin{array}{l} T_1: [5, 2] \\ T_5: [2] \end{array}\right]",
+            2,
+            r"T_3: 2",
+        )
+        self.wait(1)
+
+        coffman_graham_step(
+            r"L^* = (\Box, T_5, T_3, T_8, T_6, T_2, T_4, T_7)",
+            r"\text{candidates} = \left[\begin{array}{l} T_1: [5, 2] \end{array}\right]",
+            4,
+            r"T_5: 1",
+        )
+        self.wait(1)
+
+        coffman_graham_step(
+            r"L^* = (T_1, T_5, T_3, T_8, T_6, T_2, T_4, T_7)", r"", 0, r"T_1: 0", True
+        )
+        self.wait(2)
+
+
+class CoffmanGrahamAlgorithmRecap(Scene):
+    def construct(self):
+        title = Text("Coffman-Graham Algorithm Recap", font_size=32)
+        title.to_edge(UP)
+
+        self.play(Write(title))
+        self.wait(2)
+
+        body = Tex(
+            r"Let $G$ be a task graph and $L^*$ be an array of size equal to the number of tasks in $G$.",
+            font_size=30,
+            tex_environment="flushleft",
+        )
+
+        first_step = Tex(
+            r"1. Put all tasks with no successors at the back of $L^*$ in any order.",
+            font_size=30,
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.15)
+
+        point_intro = Tex(
+            r"2. While $L^*$ is not fully filled in, do the following:",
+            font_size=30,
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.15)
+        point1 = Tex(
+            r"i. Consider all tasks whose successors have\\",
+            r"indices defined in $L^*$ and make it a candidate.\\",
+            r"But don't make a task a candidate if it's already in $L^*$",
+            font_size=30,
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.15)
+        point2 = Tex(
+            r"ii. For each candidate task, make an array with\\",
+            r"each element being its successor indices in $L^*$\\",
+            r"sorted in decreasing order",
+            font_size=30,
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.15)
+        point3 = Tex(
+            r"iii. Pick the candidate task with the\\",
+            r"lexicographically smallest array",
+            font_size=30,
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.15)
+        point_finish = Tex(
+            r"$L^*$ is the optimal schedule for the task graph",
+            font_size=30,
+        )
+
+        body.shift(UP * 2.5)
+
+        first_step.arrange(DOWN, aligned_edge=LEFT, buff=0.4)
+        first_step.next_to(body, DOWN, buff=0.7)
+        first_step.align_to(body, LEFT)
+        first_step.shift(UP * 0.5 + RIGHT)
+
+        second_step = VGroup(point_intro, point1, point2, point3, point_finish)
+        second_step.arrange(DOWN, aligned_edge=LEFT, buff=0.4)
+        second_step.next_to(first_step, DOWN, buff=0.7)
+        second_step.align_to(first_step, LEFT)
+        second_step.shift(UP * 0.5)
+
+        point1.shift(RIGHT * 0.5)
+        point2.shift(RIGHT * 0.5)
+        point3.shift(RIGHT * 0.5)
+
+        self.play(Write(body), Write(first_step))
+        self.wait(2)
+
+        self.play(Write(second_step))
+        self.wait(2)
+
+        self.play(Write(point_finish))
+        self.wait(3)

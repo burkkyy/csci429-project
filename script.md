@@ -87,8 +87,11 @@ A nature follow up question would be, during each time step, how do we figure ou
 
 -- STOP
 
-Let this optimal schedule be denoted as Lstar, for now its still in progress so its empty. The CoffmanGrahamAlgorithm states that we fill in Lstar, in reverse order. 
-Bascially this means that we figure out which task to do last, and then work backwards until we finally figure out which task to do first. 
+Let this optimal schedule be denoted as Lstar, for now its still in progress so its empty. 
+
+The CoffmanGrahamAlgorithm states that we fill in Lstar, in reverse order. 
+Bascially this means that we figure out which task to do last, and then work backwards until we finally figure out which task to do first. To illustrate this, Im will fill in L* with blanks that will eventually be replaced by some task. There are 8 tasks, so I will put 8 blanks in L*. 
+
 By why should we do this?
 
 Well, in a sense we are looking for tasks that "can be done later" as other tasks could be higher priority.  
@@ -102,23 +105,66 @@ So lets put task 2, 4 and 7 in Lstar. It should be noted that their order doesnt
 
 -- STOP
 
-Now that Lstar is starting to get populated, I will do something that may seem strange at first, Im going to write down the position of each task in Lstar next to each task. We will see how this is useful later.
-
-Now, at this point, we want to figure out which task to do the fourth last, and then we can put that task at the front of Lstar. Remeber that Lstar is our optimal schedule we wish to find, still in progress...
-
-So, which task? Well, we can use the same exact logic as before. Which task should we do last? But whats different now is that some tasks are already in Lstar.
-
-So we should only consider tasks that are not in Lstar
-> animate array
-
--- IMPORTANT
-But now what? Well, if you look cafefully, some of these tasks have all their sucessors in Lstar 
-
-For example, T_1 successors are T_1 and T_1, which are both in Lstar. So it follows that this task can be done later.
-
-The reason here is simple, all of T_1's successors are being done later in Lstar, so we can do T_1 as later on as possible, just before its successors 
-
+Now that Lstar is starting to get populated, Im going to write down the position of each task in Lstar next to each task. We will see how this is useful later.
 
 -- break
 
-CoffmanGrahamAlgorithm states blah blah blah
+Now, at this point, we want to figure out which task to do the fourth last,
+
+So, how should we chose the task? Notice that for any task we choose, that task have at least one sucessor. 
+
+What the CoffmanGrahamAlgorithm states is that we consider all tasks with successors define in L*, so in this example task T3 has its successors, T4 and T7 defined in L*, so we will consider it a potential option. This is also true for T6. Notice this is NOT true for T1, since T3 is successor is not in L*.
+
+That was alot to unpack, but now we narrowed down which task to put in L* next.
+
+Remeber, from this list, we want to figure out which task to do as later on as possible.
+
+-- break
+
+At this point, we have array of two canidate tasks. 
+
+We reached the heart of the coffmangraham algorithm. For each task in our list of canidates, do the following. 
+
+- Find all its successors in L* and populate some array with the indexies of its successors.
+- Then we sort the indexies in decending order.
+
+And thats it. We do this for every candiate task, and we are left with a decreasing array for each canidate task. 
+
+In this example we only have two, but in a larger task graph we could have many candiate task arrays.
+
+-- break
+
+All we have to do is pick the task whose successor indecies in L* form the lexicographically smallest array.
+
+Once we found that task, we put in L* at the last blank index.
+
+And thats it. We repeat this process untill L* is completey filled in.
+
+
+
+
+
+To recap the CoffmanGrahamAlgorithm,
+
+Given a task graph,
+
+First we make an array L* with size equal to the number of tasks.
+
+Then we consider all tasks with no successors and put them in some order at the back on L*.
+
+Then, until L* is filled in, do the following:
+
+1. Consider all tasks whose successors have indices defined in L* and make it a canidate. But don't make a task a canidate if it's already in L*
+2. For each candidate task, make an array with each element being its successor indices in L* sorted in decreasing order
+3. Pick the candidate task with the lexicographically smallest array
+
+At this point L* is filled in, and is the optimal schedule for the task graph
+
+Thats the CoffmanGrahamAlgorithm algorithm.
+
+-- STOP
+
+
+Lets take a look at some psuedo code to work out its run time.
+
+first define task graph class

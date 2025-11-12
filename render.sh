@@ -5,11 +5,12 @@
 #manim -qk scenes/introduction.py TaskIntroduction
 #manim -qk scenes/introduction.py TimeComplexityExplanation
 #manim -qk scenes/introduction.py DAGScene
+#manim -qk scenes/algorithm-a.py PaperDisplay 
+#manim -qk scenes/algorithm-a.py AlgorithmA
+#manim -qk scenes/algorithm-a.py OptimalScheduleForIntroDAG
+#manim -qk scenes/algorithm-a.py CoffmanGrahamAlgorithmExplainerPart1
+manim -qk scenes/algorithm-a.py CoffmanGrahamAlgorithmRecap
 
 # done, pending render
-#manim -ql scenes/algorithm-a.py PaperDisplay 
-#manim -ql scenes/algorithm-a.py AlgorithmA
-#manim -ql scenes/algorithm-a.py OptimalScheduleForIntroDAG
 
 # in progress
-manim -ql scenes/algorithm-a.py CoffmanGrahamAlgorithmExplainerPart1
