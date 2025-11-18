@@ -5,18 +5,13 @@ class TaskGraph:
         self._successors = {}
 
         if tasks is not None and successors is not None:
-            # Add all tasks first
             self._tasks = set(tasks)
-            # Initialize successors dict with empty lists for all tasks
             for task in tasks:
                 self._successors[task] = []
-            # Now populate the successors
             for task, succ_list in successors.items():
                 self._successors[task] = list(succ_list)
-            # Set current_task_id to continue from max task id
             self._current_task_id = max(self._tasks) + 1 if self._tasks else 1
         elif tasks is not None:
-            # If only tasks provided, add them without successors
             for t in tasks:
                 self._tasks.add(t)
                 if t not in self._successors:
@@ -60,6 +55,7 @@ class TaskGraph:
         return self._successors[v]
 
 
+# helper function for coffman_graham_algorithm, O(n) where n = max(len(a),len(b))
 def less_than_lexicographically(a, b) -> bool:
     if len(a) == 0 and len(b) == 0:
         return False
@@ -83,7 +79,7 @@ def coffman_graham_algorithm(G: TaskGraph):
     alpha = {}
 
     # (a) choose first task with S(T) = {}
-    for T in G.tasks():
+    for T in G.tasks():  # O(n)
         if not G.S(T):
             alpha[T] = k
             k += 1
@@ -92,16 +88,16 @@ def coffman_graham_algorithm(G: TaskGraph):
         raise ValueError("G is not a valid task graph")
 
     # (b)
-    while k <= r:
+    while k <= r:  # In worst case, O(n). Overall O(n^3).
         N = {}
-        for T in G.tasks():
+        for T in G.tasks():  # O(n)
             if T in alpha:
                 continue
 
             all_successors_defined = True
             S_T = G.S(T)
 
-            for t in S_T:
+            for t in S_T:  # In worst case, O(n)
                 if t not in alpha:
                     all_successors_defined = False
                     break
