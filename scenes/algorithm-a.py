@@ -769,3 +769,217 @@ class CoffmanGrahamAlgorithmRecap(Scene):
 
         self.play(Write(point_finish))
         self.wait(3)
+
+
+class CoffmanGrahamAlgorithmCodeAndAnalysisSetup(Scene):
+    def construct(self):
+        task_graph_code = Code(
+            code_string="""
+class TaskGraph:
+    def add_task():
+        ...
+
+    def add_successor():
+        ...
+
+    def number_of_tasks():
+        ...
+
+    def successors(task):
+        ...
+""",
+            tab_width=4,
+            background="rectangle",
+            language="Python",
+        ).scale(0.8)
+
+        self.play(FadeIn(task_graph_code))
+        self.wait(4)
+        self.play(FadeOut(task_graph_code))
+
+        helper_functions_code1 = Code(
+            code_string="""
+def less_than_lexicographically(a, b):
+    if len(a) == 0 and len(b) == 0:
+        return False
+    if len(a) == 0:
+        return True
+
+    for i in range(min(len(a), len(b))):
+        if a[i] < b[i]:
+            return True
+        elif a[i] > b[i]:
+            return False
+
+    return len(a) < len(b)
+""",
+            tab_width=4,
+            background="rectangle",
+            language="Python",
+        ).scale(0.8)
+
+        self.play(FadeIn(helper_functions_code1))
+        self.wait(4)
+        self.play(FadeOut(helper_functions_code1))
+
+        helper_functions_code2 = Code(
+            code_string="""
+def smallest_lexicographical_array(N):
+    current_min_n = None
+    for n in N:
+        if current_min_n == None:
+            current_min_n = n
+            continue
+
+        lt_eq_lex = less_than_lexicographically(N[n], N[current_min_n])
+
+        if lt_eq_lex:
+            current_min_n = n
+        elif N[n] == N[current_min_n]:
+            if n < current_min_n:
+                current_min_n = n
+
+    return current_min_n
+""",
+            tab_width=4,
+            background="rectangle",
+            language="Python",
+        ).scale(0.8)
+
+        self.play(FadeIn(helper_functions_code2))
+        self.wait(4)
+
+
+class CoffmanGrahamAlgorithmCodeAndAnalysis(Scene):
+    def construct(self):
+        algorithm_a_code_part1 = Code(
+            code_string="""
+def coffman_graham_algorithm(G: TaskGraph):
+    r = G.number_of_tasks()
+    k = 1
+    alpha = {}
+
+    for T in G.tasks():
+        if not G.successors(T):
+            alpha[T] = k
+            k += 1
+""",
+            tab_width=4,
+            background="rectangle",
+            language="Python",
+        ).scale(0.8)
+
+        self.play(FadeIn(algorithm_a_code_part1))
+        self.wait(4)
+        self.play(FadeOut(algorithm_a_code_part1))
+
+        algorithm_a_code_part2 = Code(
+            code_string="""
+def coffman_graham_algorithm(G: TaskGraph):
+    r = G.number_of_tasks()
+    k = 1
+    alpha = {}
+
+    for T in G.tasks():
+        ...
+
+    while k <= r:
+        N = {}
+        for T in G.tasks():
+            if T in alpha:
+                continue
+
+            all_successors_defined = True
+            S_T = G.successors(T)
+
+            for t in S_T:
+                if t not in alpha:
+                    all_successors_defined = False
+                    break
+
+            if all_successors_defined:
+                N[T] = sorted([alpha[t] for t in S_T], reverse=True)
+""",
+            tab_width=4,
+            background="rectangle",
+            language="Python",
+        ).scale(0.8)
+
+        self.play(FadeIn(algorithm_a_code_part2))
+        self.wait(4)
+        self.play(FadeOut(algorithm_a_code_part2))
+
+        algorithm_a_code_part3 = Code(
+            code_string="""
+def coffman_graham_algorithm(G: TaskGraph):
+    r = G.number_of_tasks()
+    k = 1
+    alpha = {}
+
+    for T in G.tasks():
+        ... 
+
+    while k <= r:
+        N = {}
+        for T in G.tasks():
+            ...
+
+            for t in S_T:
+                ...
+            
+            ...
+
+        current_min_n = smallest_lexicographical_array(N)
+        alpha[current_min_n] = k
+        k += 1
+    
+    schedule = sorted(alpha.keys(), key=lambda task: alpha[task])
+    return schedule[::-1]
+""",
+            tab_width=4,
+            background="rectangle",
+            language="Python",
+        ).scale(0.8)
+
+        self.play(FadeIn(algorithm_a_code_part3))
+        self.wait(4)
+
+        algorithm_a_code_part4 = Code(
+            code_string="""
+def coffman_graham_algorithm(G: TaskGraph):
+    r = G.number_of_tasks()
+    k = 1
+    alpha = {}
+
+    for T in G.tasks():
+        ... 
+
+    while k <= r:  # O(n)
+        N = {}
+        for T in G.tasks():  # O(n)
+            ...
+
+            for t in S_T:  # O(n)
+                ...
+            
+            ...
+
+        current_min_n = smallest_lexicographical_array(N)
+        alpha[current_min_n] = k
+        k += 1
+    
+    schedule = sorted(alpha.keys(), key=lambda task: alpha[task])
+    return schedule[::-1]
+""",
+            tab_width=4,
+            background="rectangle",
+            language="Python",
+        ).scale(0.8)
+
+        self.play(FadeIn(algorithm_a_code_part4))
+        self.wait(4)
+
+        big_o_text = Tex(r"Time complexity:\\$O(n^3)$")
+        self.bring_to_front(big_o_text)
+        big_o_text.shift(RIGHT * 3)
+        self.play(FadeIn(big_o_text))

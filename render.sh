@@ -9,7 +9,9 @@
 #manim -qk scenes/algorithm-a.py AlgorithmA
 #manim -qk scenes/algorithm-a.py OptimalScheduleForIntroDAG
 #manim -qk scenes/algorithm-a.py CoffmanGrahamAlgorithmExplainerPart1
-manim -qk scenes/algorithm-a.py CoffmanGrahamAlgorithmRecap
+#manim -qk scenes/algorithm-a.py CoffmanGrahamAlgorithmRecap
+#manim -qk scenes/algorithm-a.py CoffmanGrahamAlgorithmCodeAndAnalysisSetup
+#manim -qk scenes/algorithm-a.py CoffmanGrahamAlgorithmCodeAndAnalysis
 
 # done, pending render
 
