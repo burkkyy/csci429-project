@@ -9,5 +9,11 @@ __pycache__/
 media/
 video/
 
+# latex
+paper.aux
+paper.log
+paper.out
+paper.pdf
+
 # Other
 notes.md
