@@ -8,7 +8,7 @@ TASK_HEIGHT = 0.8
 class Title(Scene):
     def construct(self):
         title = Text(
-            "Visual Intuition for the Optimal Scheduling of M-Processor Systems",
+            "Visual Intuition for the Optimal Scheduling of 2-Processor Systems",
             font_size=26,
         )
 
